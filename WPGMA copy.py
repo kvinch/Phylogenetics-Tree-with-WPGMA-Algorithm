@@ -1,13 +1,27 @@
 import ConstruirMatriz
 import string
 
+class NodoCluster:
+
+    def __init__(self, etiqueta = None, izq = None, der = None, distancia = 0.0, altura = 0.0):
+        self.etiqueta = etiqueta
+        self.izq = izq
+        self.der = der
+        self.distancia = distancia
+        self.altura = altura
+
 class WPGMA:
     def __init__(self, matriz):
         self.matriz = matriz
         self.n = len(matriz)
-        self.etiquetas = list(string.ascii_uppercase[:self.n]) #Se sacan las etiquetas del abecedario hasta la letra del tamaño de la matriz
-        self.cluster = [cluster for cluster in self.etiquetas] #Se crean los clusters a partir de las etiquetas: ["A", "B", "C", "D"...]
-        self.altura = {etiqueta:0.0 for etiqueta in self.etiquetas} #Se crea un valor para cada etiqueta: {"A":0.0, "B":0.0", "C":0.0} -> Es un diccionario
+        etiquetas = list(string.ascii_uppercase[:self.n])
+        #Se crean los clusters a partir de las etiquetas: ["A", "B", "C", "D"...]
+        self.cluster = []
+        for etiqueta in etiquetas:
+            nodo = NodoCluster(etiqueta = etiqueta, altura = 0.0)
+            self.cluster.append(nodo)
+
+        #self.altura = {etiqueta:0.0 for etiqueta in self.etiquetas} #Se crea un valor para cada etiqueta: {"A":0.0, "B":0.0", "C":0.0} -> Es un diccionario
 
     def distanciaMin(self): #Encontramos los índices con menor valor dentro de la matriz
         minimo = 99999 #Un número muy grande
@@ -22,15 +36,30 @@ class WPGMA:
                     min_j = j            
         return sorted((min_i, min_j)) #Retorna los índices de manera ordenada
     
+    def retornarNewick(self, NodoCluster):
+        if NodoCluster.izq is None and NodoCluster.der is None:
+            return f"{NodoCluster.etiqueta}:{NodoCluster.distancia}"
+        else:
+            izq = self.retornarNewick(NodoCluster.izq)
+            der = self.retornarNewick(NodoCluster.der)
+            return f"({izq},{der}):{NodoCluster.distancia}"
+
     def wpgma(self):
         while(self.n>1):
             x,y = self.distanciaMin() #Se encuentran los índices para el menor valor
             menorDistancia = self.matriz[x][y]
             #Se crea un nuevo cluster y se agrega a la
-            nuevaCluster = f"({self.cluster[x]}:{menorDistancia/2-self.altura[self.cluster[x]]},{self.cluster[y]}:{menorDistancia/2-self.altura[self.cluster[y]]})" 
+            nodoX = self.cluster[x]
+            nodoY = self.cluster[y]
+
+            nodoX.distancia = menorDistancia/2 - nodoX.altura
+            nodoY.distancia = menorDistancia/2 - nodoY.altura
+
+            #nuevaCluster = f"({self.cluster[x]}:{menorDistancia/2-self.altura[self.cluster[x]]},{self.cluster[y]}:{menorDistancia/2-self.altura[self.cluster[y]]})" 
             
-            
-            self.cluster.append(nuevaCluster)
+            nuevoCluster = NodoCluster(izq = nodoX, der = nodoY, altura = menorDistancia/2)
+            self.cluster.append(nuevoCluster)
+
             #Calculamos las distancias de los diferentes valores 
             DistanciasValores  = []
             for i in range(len(self.cluster)-1):
@@ -38,8 +67,8 @@ class WPGMA:
                     distancia = (self.matriz[x][i] + self.matriz[y][i])/2 #Se calculan las distancias, por ejemplo: (d(A,B) + d(A,D))/2 = d(A,(BD))  
                     DistanciasValores.append(distancia)
 
-            alturaCluster = menorDistancia/2
-            self.altura[nuevaCluster] = alturaCluster
+            
+            
 
 
             #Actualizamos todos los valores con la lista de valores
@@ -67,10 +96,16 @@ class WPGMA:
             self.n = len(nuevaMatriz) #Actualizamos el largo de la matriz
 
             del self.cluster[y]
-            del self.cluster[x] #Eliminamos los clusters antiguos
+            del self.cluster[x] #Eliminamos los cluster antiguos
             
+            Nodo = self.cluster[0]
+            
+            for i in range(len(self.cluster)): #
+                print(self.cluster[i].etiqueta) #
 
-        return self.cluster[0]
+
+
+        return f"({self.retornarNewick(Nodo)})"
 
 otus = [
         "ATCG",
@@ -92,7 +127,10 @@ matrix =[
 
 ]
 wpgma = WPGMA(matrix)
-a = wpgma.wpgma() + ";"
+a = wpgma.wpgma() 
 print(a)
+
+
+
 
 
