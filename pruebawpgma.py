@@ -36,30 +36,29 @@ class WPGMA:
                 tupla = (dist,i,j)
                 self.heap.insert(tupla)
 
-    def distanciaMin(self): #Encontramos los índices con menor valor dentro de la matriz usando MinHeap
-
+    def distanciaMin2(self): #Encontramos los índices con menor valor dentro de la matriz usando MinHeap
         while True:
-            min = self.heap.extraerMin()
-            if min == -1: break #si heap vacio, terminar
-            (dist,i,j) = min
+            valorM = self.heap.extraerMin()
+            if valorM == -1: break #si heap vacio, terminar
+            (dist,i,j) = valorM
 
             if self.cluster_activo[i] and self.cluster_activo[j]: #comprobar si ambos clusters no fueron agrupados
                 return sorted((i,j))
         return -1, -1
+    
+    def distanciaMin(self): #Encontramos los índices con menor valor dentro de la matriz usando MinHeap
+        while True:
+            valorM = self.heap.extraerMin()
+            if valorM == -1: break #si heap vacio, terminar
+            (dist,i,j) = valorM #Agrupamos el valor
 
-        """""
-        minimo = 99999 #Un número muy grande
-        min_i = -1
-        min_j = -1
+            if self.cluster_activo[i] and self.cluster_activo[j]: #comprobar si ambos clusters no fueron agrupados
+                dist_actual = self.matriz[min(i, j)][max(i, j)] #Se busca el valor actual de la matriz original
 
-        for i in range(self.n):
-            for j in range(i+1,self.n): #Se le suma un +1 para evitar correr desde el 0.0, porque sino detectaría como el menor, porque es simétrica
-                if self.matriz[i][j] < minimo:
-                    minimo = self.matriz[i][j] #Se actualiza el nuevo valor
-                    min_i = i
-                    min_j = j            
-        return sorted((min_i, min_j)) #Retorna los índices de manera ordenada
-        """
+                if abs(dist - dist_actual) <= 0.0001: #Verificamos que sean iguales, al ser flotantes, entonces existen la posibilidad de que tengan una diferencia leve
+                    return sorted((i, j))
+        return -1, -1
+
     def retornarNewick(self, NodoCluster):
         if NodoCluster.izq is None and NodoCluster.der is None:
             return f"{NodoCluster.etiqueta}:{NodoCluster.distancia}"
@@ -75,13 +74,13 @@ class WPGMA:
                 break
 
             menorDistancia = self.matriz[x][y]
-            #Se crea un nuevo cluster y se agrega a la
+            #Se crea un nuevo cluster y se agregan sus hijos
             nodoX = self.cluster[x]
             nodoY = self.cluster[y]
 
             alturaX = self.altura.get(nodoX)
             alturaY = self.altura.get(nodoY)
-            nodoX.distancia = menorDistancia/2 - alturaX
+            nodoX.distancia = menorDistancia/2 - alturaX #Se actualiza la distancia con la fórmula de WPGMA: 
             nodoY.distancia = menorDistancia/2 - alturaY
             
 
@@ -100,7 +99,7 @@ class WPGMA:
                 nueva_distancia = (dist_xi + dist_yi)/2
                 self.matriz[min(x,i)][max(x,i)] = nueva_distancia #actualizamos la matriz en la nueva posicion
 
-                self.heap.insert((nueva_distancia,x,i))
+                self.heap.insert((nueva_distancia,min(x,i),max(x,i)))
 
             self.cluster_activo[y] = False #al cluster lo marcamos como inactivo
             self.num_activos -= 1 #Un cluster activo menos
@@ -115,8 +114,12 @@ class WPGMA:
             if final_ind == -1:
                 return "No se encontró cluster final"   
 
-            Nodo = self.cluster[final_ind]
-        return self.retornarNewick(Nodo)+";"
+        Nodo = self.cluster[final_ind]
+        
+        if Nodo.izq is not None and Nodo.der is not None: #Si tiene hijos, entonces retorna el izq y  derecho
+            return f"({self.retornarNewick(Nodo.izq)},{self.retornarNewick(Nodo.der)});"
+        else:
+            return f"{self.retornarNewick(Nodo)};"
 
 otus = [
     "ATCGATCGATCGAT",
@@ -148,10 +151,21 @@ distancia_matriz = [
     [0.9, 0.8, 0.3, 0.0]
 ]
 
+mat = [
+	[0,17,	21,	31,	23],
+	[17,	0,	30,	34,	21],
+	[21,	30,	0,	28,	39]	,
+    [31,	34,	28,	0,	43],
+	[23,	21,	39,	43,	0]
+    ]
 
-wpgma = WPGMA(matriz)
+wpgma = WPGMA(mat)
 a = wpgma.wpgma() 
 print(a)
+
+
+
+
 
 
 
