@@ -19,14 +19,15 @@ Permite construir árboles evolutivos a partir de matrices de distancias mediant
     "CATGTACGTACGTA"]
   
 - Se crea una matriz de distancias con la fórmula de Jukes-Cantor (1969), *dónde se utiliza la fórmula de correción: -3/4 * log(1 - 4/3*f)*
-  
 - A partir de esta matriz, se crea la matriz con formato:
+```
 [-0.0, 0.08, 0.16, 0.25, 1.08, 1.46]
 [0.08, -0.0, 0.08, 0.16, 1.08, 1.08]
 [0.16, 0.08, -0.0, 0.08, 1.46, 1.46]
 [0.25, 0.16, 0.08, -0.0, 1.08, 1.08]
 [1.08, 1.08, 1.46, 1.08, -0.0, 0.25]
 [1.46, 1.08, 1.46, 1.08, 0.25, -0.0]
+```
 
 - Finalmente, nos da el resultado del newick (((A:0.04,B:0.04):0.04125,(C:0.04,D:0.04):0.04125):0.53,(E:0.125,F:0.125):0.48625000000000007);
 - Como paso opcional, se utilizaron librerías para que ayuden a la visualización del árbol filogenético a partir del newick resultante.
