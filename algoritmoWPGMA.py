@@ -35,16 +35,6 @@ class WPGMA:
                 dist = self.matriz[i][j]
                 tupla = (dist,i,j)
                 self.heap.insert(tupla)
-
-    def distanciaMin2(self): #Encontramos los índices con menor valor dentro de la matriz usando MinHeap
-        while True:
-            valorM = self.heap.extraerMin()
-            if valorM == -1: break #si heap vacio, terminar
-            (dist,i,j) = valorM
-
-            if self.cluster_activo[i] and self.cluster_activo[j]: #comprobar si ambos clusters no fueron agrupados
-                return sorted((i,j))
-        return -1, -1
     
     def distanciaMin(self): #Encontramos los índices con menor valor dentro de la matriz usando MinHeap
         while True:
