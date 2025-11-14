@@ -24,12 +24,12 @@ class WPGMA:
         self.num_activos = self.n #Contador clusters no agrupados
 
 
-        for etiqueta in etiquetas:
+        for etiqueta in etiquetas: 
             nodo = NodoCluster(etiqueta = etiqueta)
             self.cluster.append(nodo)
             self.altura.insertar(nodo, 0.0) #Se crea un nodo para cada etiqueta: {"A":0.0, "B":0.0", "C":0.0} -> Es un HashTable
 
-        self.heap = MinHeap.MinHeap()
+        self.heap = MinHeap.MinHeap() #Se crea un minheap y se van agregando los datos del arreglo, de tal manera que: (valor,i,j)
         for i in range(self.n):
             for j in range(i+1, self.n):
                 dist = self.matriz[i][j]
@@ -49,13 +49,13 @@ class WPGMA:
                     return sorted((i, j))
         return -1, -1
 
-    def retornarNewick(self, NodoCluster):
-        if NodoCluster.izq is None and NodoCluster.der is None:
+    def retornarNewick(self, NodoCluster): #Función para retornar el newick
+        if NodoCluster.izq is None and NodoCluster.der is None: #Al ser hoja, solamente se retorna su etiqueta y su valor
             return f"{NodoCluster.etiqueta}:{NodoCluster.distancia}"
         else:
-            izq = self.retornarNewick(NodoCluster.izq)
+            izq = self.retornarNewick(NodoCluster.izq) 
             der = self.retornarNewick(NodoCluster.der)
-            return f"({izq},{der}):{NodoCluster.distancia}"
+            return f"({izq},{der}):{NodoCluster.distancia}" #retornamos con recursividad de todo su lado derecho con su lado izquierdo
 
     def wpgma(self):
         while(self.num_activos>1):
@@ -68,7 +68,7 @@ class WPGMA:
             nodoX = self.cluster[x]
             nodoY = self.cluster[y]
 
-            alturaX = self.altura.get(nodoX)
+            alturaX = self.altura.get(nodoX) #Se sacan las alturas a partir del hashTable
             alturaY = self.altura.get(nodoY)
             nodoX.distancia = menorDistancia/2 - alturaX #Se actualiza la distancia con la fórmula de WPGMA: 
             nodoY.distancia = menorDistancia/2 - alturaY
@@ -76,9 +76,9 @@ class WPGMA:
 
             nuevoCluster = NodoCluster(izq = nodoX, der = nodoY)
             self.cluster[x] = nuevoCluster #Sobreescribir nuevo cluster que representa el nuevo agrupado 
-            self.altura.insertar(nuevoCluster, menorDistancia/2)
+            self.altura.insertar(nuevoCluster, menorDistancia/2) #Se interta el nuevo valor de la distancia en el Hash Table
 
-            for i in range(self.n):
+            for i in range(self.n): #Se saltan todos aquellos clusters que no son aquellos que se acaban de fusionar
                 if i==x or i==y or not self.cluster_activo[i]:
                     continue
 
@@ -89,20 +89,20 @@ class WPGMA:
                 nueva_distancia = (dist_xi + dist_yi)/2
                 self.matriz[min(x,i)][max(x,i)] = nueva_distancia #actualizamos la matriz en la nueva posicion
 
-                self.heap.insert((nueva_distancia,min(x,i),max(x,i)))
+                self.heap.insert((nueva_distancia,min(x,i),max(x,i))) #Insertamos en el heap la nueva distancia
 
             self.cluster_activo[y] = False #al cluster lo marcamos como inactivo
             self.num_activos -= 1 #Un cluster activo menos
 
             final_ind = -1
             #Encontrar único true
-            for i in range(len(self.cluster_activo)):
+            for i in range(len(self.cluster_activo)): #Se recorre todas las posiciones hasta encontrar el único cluster activo, que será el resultado final
                 if self.cluster_activo[i] == True:
                     final_ind = i
                     break
 
             if final_ind == -1:
-                return "No se encontró cluster final"   
+                return "No se encontró cluster final"   #Si no se encuentra entonces no existe un cluster
 
         Nodo = self.cluster[final_ind]
         
