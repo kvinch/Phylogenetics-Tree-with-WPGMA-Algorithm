@@ -5,7 +5,7 @@ Este proyecto implementa algoritmos de **análisis filogenético** utilizando es
 Permite construir árboles evolutivos a partir de matrices de distancias mediante el método **WPGMA**.
 
 ## Instalación ⚙️
-1. Clona este repositorio con el comando: *git clone https://github.com/kvinch/ProyectoED2.git*.
+1. Clona este repositorio con el comando: *git clone https://github.com/kvinch/Phylogenetics-Tree-with-WPGMA-Algorithm.git*.
 2. Entra a la carpeta del proyecto e instala los requerimientos (opcionales): *pip install -r requerimientos.txt*.
 3. Ejecuta el programa principal que está en main.py. Puedes cambiar las secuencias de OTUS de acuerdo a tu agrado.
 
